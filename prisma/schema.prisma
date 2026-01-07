@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model autopay_config {
+  id             Int       @id @default(autoincrement())
+  is_enabled     Boolean?  @default(true)
+  effective_from DateTime? @db.Date
+  updated_at     DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model bonus {
+  id            Int       @id @default(autoincrement())
+  employee_id   String    @db.VarChar(20)
+  bonus_type    String?   @db.VarChar(20)
+  bonus_code    String?   @db.VarChar(50)
+  festival_name String?   @db.VarChar(50)
+  amount        Decimal?  @db.Decimal(10, 2)
+  month         Int?
+  year          Int
+  reason        String?   @db.VarChar(100)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+
+  @@unique([employee_id, bonus_type, bonus_code])
+}
+
+model deduction {
+  id          Int       @id @default(autoincrement())
+  employee_id String    @db.VarChar(20)
+  type        String?   @default("Tax") @db.VarChar(50)
+  amount      Decimal?  @db.Decimal(10, 2)
+  month       Int?
+  year        Int?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+
+  @@unique([employee_id, month, year])
+}
+
+model fixedamount {
+  id         Int       @id @default(autoincrement())
+  type       String?   @unique(map: "fixedamount_type_unique") @db.VarChar(20)
+  percentage Decimal?  @db.Decimal(5, 2)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model payment {
+  payment_id      BigInt    @id @default(autoincrement())
+  payroll_id      BigInt?
+  employee_id     String    @db.VarChar(20)
+  amount          Decimal   @db.Decimal(12, 2)
+  payment_mode    String?   @db.VarChar(20)
+  payment_status  String?   @default("SUCCESS") @db.VarChar(20)
+  transaction_ref String?   @db.VarChar(100)
+  paid_at         DateTime? @default(now()) @db.Timestamp(6)
+
+  @@unique([employee_id, payroll_id])
+}
+
+model payroll {
+  payroll_id     BigInt    @id @default(autoincrement())
+  employee_id    String    @db.VarChar(20)
+  name           String?   @db.VarChar(255)
+  month          Int
+  year           Int
+  basic_salary   Decimal   @db.Decimal(12, 2)
+  office_days    Decimal?  @db.Decimal(5, 1)
+  worked_days    Decimal?  @db.Decimal(5, 1)
+  allowances     Decimal?  @default(0) @db.Decimal(12, 2)
+  bonuses        Decimal?  @default(0) @db.Decimal(12, 2)
+  deductions     Decimal?  @default(0) @db.Decimal(12, 2)
+  gross_salary   Decimal?  @db.Decimal(12, 2)
+  net_salary     Decimal?  @db.Decimal(12, 2)
+  status         String?   @default("ACTIVE") @db.VarChar(20)
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  updated_at     DateTime? @default(now()) @db.Timestamp(6)
+  one_day_salary Decimal?  @db.Decimal(10, 2)
+
+  @@unique([employee_id, month, year], map: "payroll_employee_month_year_unique")
+}
+
+model payroll_log {
+  id             BigInt    @id @default(autoincrement())
+  payroll_run_id String?   @db.Uuid
+  employee_id    String?   @db.VarChar(20)
+  action         String?   @db.VarChar(50)
+  message        String?
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model payroll_run {
+  id           String    @id @db.Uuid
+  month        Int
+  year         Int
+  triggered_by String?   @db.VarChar(20)
+  status       String?   @default("PROCESSING") @db.VarChar(20)
+  started_at   DateTime? @default(now()) @db.Timestamp(6)
+  completed_at DateTime? @db.Timestamp(6)
+
+  @@unique([month, year])
+}
+
+model payslip {
+  id           BigInt    @id @default(autoincrement())
+  employee_id  String    @db.VarChar(20)
+  payroll_id   BigInt?
+  file_path    String
+  generated_at DateTime? @default(now()) @db.Timestamp(6)
+  expires_at   DateTime  @db.Timestamp(6)
+}
+
+model salaryamount {
+  id           Int       @id @default(autoincrement())
+  employee_id  String    @unique @db.VarChar(20)
+  basic_salary Decimal   @db.Decimal(10, 2)
+  allowances   Decimal   @db.Decimal(10, 2)
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  updated_at   DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model user {
+  user_id          String    @id @db.VarChar(20)
+  first_name       String?   @db.VarChar(100)
+  last_name        String?   @db.VarChar(100)
+  email            String?   @unique @db.VarChar(255)
+  password_hash    String?
+  date_of_birth    DateTime? @db.Date
+  gender           String?   @db.VarChar(10)
+  address          String?
+  contact_number   String?   @db.VarChar(15)
+  alternate_number String?   @db.VarChar(15)
+  pan_number       String?   @db.VarChar(20)
+  aadhar_number    String?   @db.VarChar(20)
+  bank_account_no  String?   @db.VarChar(30)
+  ifsc_code        String?   @db.VarChar(15)
+  branch_name      String?   @db.VarChar(50)
+  department       String?   @db.VarChar(50)
+  role_id          Int?
+  domain_id        Int?
+  reporting_to     Int?
+  status           String?   @default("active") @db.VarChar(20)
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  updated_at       DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model notification_log {
+  id           BigInt    @id @default(autoincrement())
+  type         String    @db.VarChar(30)
+  reference_id BigInt?
+  recipient    String?   @db.VarChar(255)
+  status       String?   @default("SENT") @db.VarChar(20)
+  message      String?
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+}

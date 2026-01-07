@@ -1,0 +1,35 @@
+{
+  "name": "payroll-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "6.19",
+    "axios": "^1.13.2",
+    "chai": "^6.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.1",
+    "jest": "^30.2.0",
+    "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.3",
+    "mocha": "^11.7.5",
+    "nodemailer": "^7.0.11",
+    "pdfkit": "^0.17.2",
+    "prisma": "6.19",
+    "sinon": "^21.0.1",
+    "supertest": "^7.1.4",
+    "swagger-jsdoc": "^6.0.0",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^13.0.0",
+    "winston": "^3.19.0"
+  }
+}
