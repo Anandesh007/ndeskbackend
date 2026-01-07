@@ -5,7 +5,7 @@ import { allowedRoles } from '../middleware/role.middleware.js';
 
 const router = express.Router();
 
-router.post('/generate',authenticate,allowedRoles(1),generate);//It is internally calculated
-router.post('/download',authenticate,allowedRoles(1),downloadPayslip);
+router.post('/generate',authenticate,generate);//It is internally calculated
+router.post('/download',authenticate,downloadPayslip);
 
 export default router;

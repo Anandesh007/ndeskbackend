@@ -3,6 +3,7 @@ import * as adminNotify from '../services/adminNotification.service.js';
 import * as empNotify from '../services/employeeNotification.service.js';
 import { notificationController } from '../controllers/notification.controller.js';
 import { authenticate } from '../middleware/authenticate.middleware.js';
+import { allowedRoles } from '../middleware/role.middleware.js';
 
 const router = express.Router();
 
